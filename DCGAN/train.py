@@ -91,10 +91,10 @@ def main(_):
 
                 # plot
                 fig = plot(samples)
-                plt.savefig(FLAGS.out_dir + '{}.png'.format(str(i).zfill(3)),bbox_inches='tight')
+                plt.savefig((FLAGS.out_dir + '/out{}.png').format(str(i).zfill(3)), bbox_inches='tight')
                 i += 1
                 plt.close(fig)
-            
+
             # next input batch
             X_mb, _ = mnist.train.next_batch(batch_size)
 
@@ -113,3 +113,4 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', type=str, default='./out', help='Directory for storing output data')
     FLAGS, unparsed = parser.parse_known_args()
     tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
+    
