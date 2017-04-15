@@ -1,4 +1,4 @@
-# Deep Convolutional Generative Adversarial Network
+# Auto Encoder
 
 Run the training session and test it
 ```bash
