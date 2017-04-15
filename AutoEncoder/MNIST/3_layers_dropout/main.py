@@ -87,7 +87,7 @@ def main(_):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_dir', type=str, default='../../MNIST_data', help='Directory for storing input data')
+    parser.add_argument('--data_dir', type=str, default='../../../MNIST_data', help='Directory for storing input data')
     parser.add_argument('--out_dir', type=str, default='./out', help='Directory for storing output data')
     FLAGS, unparsed = parser.parse_known_args()
     tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
