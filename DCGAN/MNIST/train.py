@@ -47,9 +47,12 @@ def plot(samples):
         plt.imshow(sample.reshape(28, 28), cmap='Greys_r')
     return fig
 
+def save(samples, i):
+    fig = plot(samples)
+    plt.savefig((FLAGS.out_dir + '/out{}.png').format(str(i).zfill(3)), bbox_inches='tight')
+    plt.close(fig)
 
 def main(_):
-
     # create foler for generated images
     if not os.path.exists(FLAGS.out_dir):
         os.makedirs(FLAGS.out_dir)
@@ -59,17 +62,18 @@ def main(_):
 
     # data placeholders
     X = tf.placeholder(tf.float32, shape=[None, 784])
-    Z = tf.placeholder(tf.float32, shape=[None, 100])
+    Z = tf.placeholder(tf.float32, shape=[None, 100]) # MNIST input by 100x batch
 
     # initializes generator and discriminator
     _generator = generator.Generator()
     _discriminator = discriminator.Discriminator()
-    
+
+    # generates and discriminates
     G_sample = _generator.generate(Z)
     D_real, D_logit_real = _discriminator.discriminate(X)
     D_fake, D_logit_fake = _discriminator.discriminate(G_sample)
 
-    # losses:
+    # losses
     D_loss_real = model.reduce_mean(D_logit_real, tf.ones_like(D_logit_real))
     D_loss_fake = model.reduce_mean(D_logit_fake, tf.zeros_like(D_logit_fake))
     D_loss = D_loss_real + D_loss_fake
@@ -88,19 +92,18 @@ def main(_):
         for it in range(training_iter):
             if it % display_step == 0:
                 samples = sess.run(G_sample, feed_dict={Z: sample_Z(16, Z_dim)})
-
-                # plot
-                fig = plot(samples)
-                plt.savefig((FLAGS.out_dir + '/out{}.png').format(str(i).zfill(3)), bbox_inches='tight')
+                # save
+                save(samples, i)
                 i += 1
-                plt.close(fig)
 
             # next input batch
             X_mb, _ = mnist.train.next_batch(batch_size)
 
             # run session
-            _, D_loss_curr = sess.run([D_solver, D_loss], feed_dict={X: X_mb, Z: sample_Z(batch_size, Z_dim)})
-            _, G_loss_curr = sess.run([G_solver, G_loss], feed_dict={Z: sample_Z(batch_size, Z_dim)})
+            if it % 1 == 0:
+                _, D_loss_curr = sess.run([D_solver, D_loss], feed_dict={X: X_mb, Z: sample_Z(batch_size, Z_dim)})
+            else:
+                _, G_loss_curr = sess.run([G_solver, G_loss], feed_dict={Z: sample_Z(batch_size, Z_dim)})
 
             if it % display_step == 0:
                 print('Iter: {}'.format(it))
@@ -109,8 +112,7 @@ def main(_):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_dir', type=str, default='../MNIST_data', help='Directory for storing input data')
+    parser.add_argument('--data_dir', type=str, default='../../MNIST_data', help='Directory for storing input data')
     parser.add_argument('--out_dir', type=str, default='./out', help='Directory for storing output data')
     FLAGS, unparsed = parser.parse_known_args()
     tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
-    

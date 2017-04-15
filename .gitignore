@@ -2,7 +2,7 @@
 
 # folder output
 /out
-/DCGAN/out
+/DCGAN/MNIST/out
 
 # compiled output
 /dist
