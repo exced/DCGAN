@@ -28,7 +28,6 @@ learning_rate = 0.002
 batch_size = 256
 training_iter = 50
 display_step = 1
-nb_test = 5
 
 def plot(datas, mnist):
     f, a = plt.subplots(2, 10, figsize=(10, 2))
@@ -37,9 +36,9 @@ def plot(datas, mnist):
         a[1][i].imshow(np.reshape(datas[i], (28, 28)))
     return f
 
-def save(i, samples, mnist):
+def save(samples, mnist):
     fig = plot(samples, mnist)
-    plt.savefig((FLAGS.out_dir + '{}/out.png').format(str(i).zfill(3)), bbox_inches='tight')
+    plt.savefig((FLAGS.out_dir + '/out.png').format(), bbox_inches='tight')
     plt.close(fig)
 
 def main(_):
@@ -82,12 +81,9 @@ def main(_):
                 print('Iter: {}'.format(it))
                 print('cost: {:.4}'. format(loss_curr))
 
-        # test
-        for it in range(10*nb_test):
-            # next test batch
-            T_mb, _ = mnist.test.next_batch(10)
-            test = sess.run(X_fake, feed_dict={X: T_mb})
-            save(it, test, T_mb)
+        # test on 10 test images
+        test = sess.run(X_fake, feed_dict={X: mnist.test.images[:10]})
+        save(test, mnist.test.images)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
